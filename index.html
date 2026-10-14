@@ -129,15 +129,27 @@ function sm(a,b){const i=x=>x>=a&&x<b,rs=S.rides.filter(r=>i(r.st)),ic=rs.reduce
 function addH(){const c=$('#hc').value.trim(),v=num($('#hv').value);if(!S.jd)return toast('Primero toca el botón verde para iniciar tu día.');if(!c||!v)return toast('Escribe qué gastaste y el precio.');addExp(catDe(c),c,v,'');hd={c:'',v:'',n:''};render();toast('Gasto guardado: '+c+' '+money(v))}
 const ymd=d=>{const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())};
 async function dlAll(){const b=balN(30);if(!b.ds)return toast('Aún no hay registros para descargar.');
- const days=[...b.days].reverse();
- const W=900,X=44,LH=54,R0=222,H=R0+days.length*LH+40,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d'),F='Roboto,Arial,sans-serif';
- const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()},col=v=>v<0?'#ff6b61':'#c6ff00';
+ const days=[...b.days].filter(d=>d.has).reverse(),DH=64,RH=74,TH=100,GAP=22,R0=222,W=900,X=44,H=R0+days.reduce((s,d)=>s+DH+Math.max(d.r.length,1)*RH+TH+GAP,0)+30,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d'),F='Roboto,Arial,sans-serif';
+ const col=v=>v<0?'#ff6b61':'#c6ff00',pl=n=>n?String(n):'Sin nombre',fit=(t,mw)=>{if(c.measureText(t).width<=mw)return t;while(t.length>1&&c.measureText(t+'…').width>mw)t=t.slice(0,-1);return t+'…'};
  c.fillStyle='#000';c.fillRect(0,0,W,H);c.textAlign='left';
  c.fillStyle='#fff';c.font='900 56px '+F;c.fillText('TAXICHURRO',X,86);
  c.fillStyle='#c6ff00';c.font='700 28px '+F;c.fillText('IQUITOS · Mis ganancias',X,128);
  c.fillStyle='#9a9a9a';c.font='22px '+F;c.fillText('Generado el '+fdt(Date.now()),X,162);
- c.textAlign='left';c.fillStyle='#9a9a9a';c.font='24px '+F;c.fillText('Ganancia por día',X,R0-14);
- days.forEach((d,k)=>{const y=R0+k*LH+34;c.textAlign='left';c.fillStyle=d.has?'#fff':'#777';c.font='26px '+F;c.fillText(dshort(d.ms),X,y);c.textAlign='right';c.fillStyle=d.has?col(d.net):'#777';c.font='700 26px '+F;c.fillText(money(d.net),W-X,y);c.fillStyle='#2a2a2a';c.fillRect(X,y+14,W-X*2,2)});
+ c.fillStyle='#9a9a9a';c.font='24px '+F;c.fillText('Lista diaria de carreras',X,R0-14);
+ let y=R0;
+ days.forEach(d=>{
+  c.textAlign='left';c.fillStyle='#fff';c.font='700 30px '+F;const dt=dshort(d.ms);c.fillText(dt,X,y+40);const dw=c.measureText(dt).width;
+  c.fillStyle='#9a9a9a';c.font='22px '+F;c.fillText(' · '+d.r.length+(d.r.length==1?' carrera':' carreras'),X+dw,y+40);
+  c.fillStyle='#c6ff00';c.fillRect(X,y+52,W-X*2,2);y+=DH;
+  if(!d.r.length){c.textAlign='left';c.fillStyle='#777';c.font='24px '+F;c.fillText('Sin carreras',X,y+40);y+=RH}
+  [...d.r].sort((p,q)=>p.st-q.st).forEach((r,n)=>{
+   c.textAlign='left';c.fillStyle='#fff';c.font='26px '+F;c.fillText(fit((n+1)+'. '+pl(r.sn)+(r.en?' → '+pl(r.dn):''),W-X*2-170),X,y+30);
+   c.fillStyle='#9a9a9a';c.font='20px '+F;c.fillText(hhmm(r.st)+' · '+dur(r.en-r.st)+' · '+dist(r.dm),X,y+58);
+   c.textAlign='right';c.fillStyle='#c6ff00';c.font='700 28px '+F;c.fillText(money(r.price),W-X,y+34);
+   c.fillStyle='#2a2a2a';c.fillRect(X,y+RH-4,W-X*2,1);y+=RH});
+  y+=4;c.textAlign='left';c.fillStyle='#9a9a9a';c.font='24px '+F;c.fillText('Total de gastos',X,y+34);c.textAlign='right';c.fillStyle='#ff6b61';c.font='700 28px '+F;c.fillText(money(d.g),W-X,y+34);
+  y+=44;c.textAlign='left';c.fillStyle='#fff';c.font='700 28px '+F;c.fillText('Ganancia neta',X,y+36);c.textAlign='right';c.fillStyle=col(d.net);c.font='900 34px '+F;c.fillText(money(d.net),W-X,y+36);
+  y+=52;y+=GAP});
  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(!blob)return toast('No se pudo crear la imagen.');
  const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='Taxichurro_ganancias_'+ymd(new Date())+'.png';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast('Imagen lista: revisa tus descargas')}
 function startDay(){if(S.jd)return;S.jd={st:Date.now()};if(!S.since)S.since=S.jd.st;save();render();toast('Iniciaste tu día')}
