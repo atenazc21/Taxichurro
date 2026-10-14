@@ -152,7 +152,7 @@ const gf=`<div style="margin:12px 0 4px"><input id="hc" placeholder="¿Qué gast
 const ib=rs.map((r,n)=>li(n+1,rl(r),`${hhmm(r.st)} · ${dur(r.en-r.st)} · ${dist(r.dm)}`,money(r.price),'var(--l)')).join('')+ins.map(o=>li('+','Otro ingreso: '+esc(o.c),hhmm(o.ts),money(o.amt),'var(--l)')).join('')||'<p class="s">Aún no hay carreras hoy.</p>';
 const gl=ex.map((g,n)=>li(n+1,esc(g.c),expd(g),money(g.amt),'var(--r)')).join('')||'<p class="s">Aún no hay gastos hoy.</p>';
 return `<div class="top"><button class="ib" onclick="menu()" aria-label="Menú">☰</button><div class="c"><div class="lg">TAXICHURRO</div><span class="pill">IQUITOS</span></div>${pb}</div>
-<div class="hero"><div style="font-size:23px;font-weight:700">${jd?'Día iniciado a las '+hhmm(jd.st)+' · '+dur(Date.now()-jd.st):'¿Listo para trabajar?'}</div><img class="mt" src="${$('#im').src}" alt="Mototaxi"></div>
+<div class="hero"><img class="mt" src="${$('#im').src}" alt="Mototaxi"></div>
 <button class="big go ${a?'red':''} ${jd?'':'dis'}" onclick="tapRide()">${lab}</button>
 ${a?`<div class="card"><div class="s">${a.status=='A'?'Carrera en curso desde '+hhmm(a.st):'Falta registrar el cobro'}</div><b>Inicio: ${nl(a.sn)}</b>${a.en?`<br><b>Destino: ${nl(a.dn)}</b>`:''}</div>`:''}
 ${kc('i','+','var(--l)','Ingresos de hoy',money(h.i),ib)}${kc('g','−','var(--r)','Gastos de hoy',money(h.g),gf)}
@@ -175,7 +175,7 @@ if(!b.days.length)return head+'<p class="s">Tu historial aparecerá aquí desde 
 const R=[['Hoy','hoy',1],['Semanal','últimos 7 días',7],['Quincenal','últimos 15 días',15],['Mensual','últimos 30 días',30]].map(([t,u,n])=>[t,u,balN(n).net]);
 const sum=`<div class="card" style="border-color:var(--l)"><b>Mis ganancias</b>${R.map(r=>`<div class="sp" style="margin-top:10px"><div>${r[0]}<div class="s">${r[1]}</div></div><b style="font-size:22px;color:${col(r[2])}">${money(r[2])}</b></div>`).join('')}</div>`;
 const rows=[...b.days].reverse().map(d=>`<div class="card" style="padding:12px 16px;margin-bottom:8px"><div class="sp" ${d.has?`style="cursor:pointer" onclick="tgD('${d.key}')"`:''}><span style="${d.has?'':'color:var(--s)'}">${dshort(d.ms)}</span><b style="color:${d.has?col(d.net):'var(--s)'}">${money(d.net)}</b></div>${d.has&&oD[d.key]?detalle(d):''}</div>`).join('');
-return head+sum+'<div class="s" style="margin:6px 0 8px">Ganancia por día (toca un día para ver sus carreras)</div>'+rows}
+return head+rows}
 function stats(){const P=(n,t)=>{const x=tot(t),L=(a,b,c)=>`<div class="sp" style="margin:3px 0;color:${c||'#fff'}"><span>${a}</span><b>${b}</b></div>`;return `<div class="card"><b style="color:var(--l);font-size:18px">${n}</b><div style="margin-top:8px">${L('Ingresos',money(x.i))}${L('&nbsp;&nbsp;Carreras',money(x.ic),'var(--s)')}${L('&nbsp;&nbsp;Otros ingresos',money(x.ie),'var(--s)')}${L('Gastos',money(x.g))}${L('Número de carreras',x.n)}</div><div class="s" style="margin-top:8px">Ganancia neta</div><div class="m" style="font-size:34px;color:${x.net<0?'var(--r)':'var(--l)'}">${money(x.net)}</div></div>`};return `<h2>Estadísticas</h2>${P('Hoy',0)}${P('Esta semana (lunes a domingo)',1)}${P('Este mes',2)}`}
 const PG={home:()=>'<div class="hm">'+home()+'</div>',car:carreras,gas:dinero,his:historial,est:stats,ing:ingreso},TABS=[['home','Inicio'],['his','Historial']];
 function render(){
